@@ -18,12 +18,14 @@ class CalorieTracker {
     addMeal(meal) {
         this._meals.push(meal);
         this._totalCalories += meal.calories;
+        this._displayNewMeal(meal);
         this._render(); // To render / update the values (total calories) - DOM
     }
 
     addWorkout(workout) {
         this._workouts.push(workout);
         this._totalCalories -= workout.calories;
+        this._displayNewWorkout(workout);
         this._render(); // To render / update the values (total calories) - DOM
     }
 
@@ -80,6 +82,52 @@ class CalorieTracker {
         const percentageOfCalorieProgress = (this._totalCalories / this._calorieLimit) * 100;
         const width = Math.min(percentageOfCalorieProgress, 100);   // .min takes the lower value of percentageOfCalorieProgress and 100 - for the case percentageOfCalorieProgress is geater than 100
         caloriesProgressEl.style.width = `${width}%`;
+    }
+
+    _displayNewMeal(meal) { // To display new added meal items
+        const mealsEl = document.getElementById('meal-items');  // The div where all meal items goes in
+        const mealEl = document.createElement('div');   // To create an element for the new added meal
+        mealEl.classList.add('card', 'my-2');  // To add the needed classes to the new created div
+        mealEl.setAttribute('data-id', meal.id);    // To create an attribute with the name data-id with the value meal.id to be able to chose the respective div later
+        mealEl.innerHTML = `              
+        <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between">
+          <h4 class="mx-1">${meal.name}</h4>
+          <div
+            class="fs-1 bg-primary text-white text-center rounded-2 px-2 px-sm-5"
+          >
+          ${meal.calories}
+          </div>
+          <button class="delete btn btn-danger btn-sm mx-2">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        </div>`;    // This is the hardcoded code block from the HTML file
+
+        mealsEl.appendChild(mealEl);    // To finally append the new createt meal item to the meal-items div
+    }
+
+    _displayNewWorkout(workout) { // To display new added meal items
+        const workoutsEl = document.getElementById('workout-items');  // The div where all workout items goes in
+        const workoutEl = document.createElement('div');   // To create an element for the new added workout
+        workoutEl.classList.add('card', 'my-2');  // To add the needed classes to the new created div
+        workoutEl.setAttribute('data-id', workout.id);    // To create an attribute with the name data-id with the value workout.id to be able to chose the respective div later
+        workoutEl.innerHTML = `              
+        <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between">
+          <h4 class="mx-1">${workout.name}</h4>
+          <div
+            class="fs-1 bg-secondary text-white text-center rounded-2 px-2 px-sm-5"
+          >
+          ${workout.calories}
+          </div>
+          <button class="delete btn btn-danger btn-sm mx-2">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        </div>`;    // This is the hardcoded code block from the HTML file
+
+        workoutsEl.appendChild(workoutEl);    // To finally append the new createt meal item to the meal-items div
     }
 
     _render() { // To render / update the values (total calories...) - DOM
