@@ -128,15 +128,15 @@ class App {
     constructor() {
         this._tracker = new CalorieTracker(); // To create a new tracker
 
-        document.getElementById('meal-form').addEventListener('submit', this._newMeal.bind(this)); // // To add a new meal to the tracker via form // without .bind(this) .this would just refer to <form id="meal-form"> but it should refer to App {_tracker: CalorieTracker}
-        document.getElementById('workout-form').addEventListener('submit', this._newWorkout.bind(this)); // // To add a new workout to the tracker via form // without .bind(this) .this would just refer to <form id="meal-form"> but it should refer to App {_tracker: CalorieTracker}
+        document.getElementById('meal-form').addEventListener('submit', this._newItem.bind(this, 'meal')); // // To add a new meal to the tracker via form // without .bind(this) .this would just refer to <form id="meal-form"> but it should refer to App {_tracker: CalorieTracker} - 'meal' after this is just a parameter we typed in to be able to distinguish between meal and workout
+        document.getElementById('workout-form').addEventListener('submit', this._newItem.bind(this, 'workout')); // // To add a new workout to the tracker via form // without .bind(this) .this would just refer to <form id="meal-form"> but it should refer to App {_tracker: CalorieTracker} - 'workout' after this is just a parameter we typed in to be able to distinguish between meal and workout
     }
 
-    _newMeal(e) {   // To call the private method newMeal 
+    _newItem(type, e) {   // To call the private method newItem (type is the argument = meal or workout)
         e.preventDefault(); // To prevent the submission
         // console.log(this);
-        const nameField = document.getElementById('meal-name');    // To get the meal name field from the input form + Add Meal
-        const caloriesField = document.getElementById('meal-calories');    // To get the meal calories field from the input form + Add Meal
+        const nameField = document.getElementById(`${type}-name`);    // To get the meal / workout name field from the input form + Add Meal / Workout
+        const caloriesField = document.getElementById(`${type}-calories`);    // To get the meal / workout calories field from the input form + Add Meal / Workout
 
         // Validate inputs
         if (nameField.value === '' || caloriesField.value === '') {
@@ -145,43 +145,21 @@ class App {
         }
 
         // To add the typed in meal to the tracker
-        const meal = new Meal(nameField.value, +caloriesField.value);   // To create a new meal - the plus sign changes the string-type caloriesValue to the number-type
-        this._tracker.addMeal(meal); // To add the meal to the tracker
+        if (type === 'meal') {
+            const meal = new Meal(nameField.value, +caloriesField.value);   // To create a new meal - the plus sign changes the string-type caloriesValue to the number-type
+            this._tracker.addMeal(meal); // To add the meal to the tracker
+        } else {
+            const workout = new Workout(nameField.value, +caloriesField.value);   // To create a new workout - the plus sign changes the string-type caloriesValue to the number-type
+            this._tracker.addWorkout(workout); // To add the workout to the tracker
+        }
 
         // To clear the form after submitting a new meal
         nameField.value = '';
         caloriesField.value = '';
 
         // To collapse the form after submission
-        const collapseMealDiv = document.getElementById('collapse-meal');   // The div where the meal form is in
-        const bsCollapse = new bootstrap.Collapse(collapseMealDiv, {    // We have access to it because of the boostrap JS file
-            toggle: true
-        })
-    }; 
-
-    _newWorkout(e) {   // To call the private method newMeal 
-        e.preventDefault(); // To prevent the submission
-        // console.log(this);
-        const nameField = document.getElementById('workout-name');    // To get the meal name field from the input form + Add Meal
-        const caloriesField = document.getElementById('workout-calories');    // To get the meal calories field from the input form + Add Meal
-
-        // Validate inputs
-        if (nameField.value === '' || caloriesField.value === '') {
-            alert('Please fill in all fields');
-            return;
-        }
-
-        // To add the typed in meal to the tracker
-        const workout = new Workout(nameField.value, +caloriesField.value);   // To create a new workout - the plus sign changes the string-type caloriesValue to the number-type
-        this._tracker.addWorkout(workout); // To add the workout to the tracker
-
-        // To clear the form after submitting a new workout
-        nameField.value = '';
-        caloriesField.value = '';
-
-        // To collapse the form after submission
-        const collapseWorkoutlDiv = document.getElementById('collapse-workout');   // The div where the meal form is in
-        const bsCollapse = new bootstrap.Collapse(collapseWorkoutlDiv, {    // We have access to it because of the boostrap JS file
+        const collapseMeaOrWorkoutlDiv = document.getElementById(`collapse-${type}`);   // The div where the meal / workout form is in
+        const bsCollapse = new bootstrap.Collapse(collapseMeaOrWorkoutlDiv, {    // We have access to it because of the boostrap JS file
             toggle: true
         })
     }; 
