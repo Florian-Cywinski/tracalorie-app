@@ -1,5 +1,5 @@
 
-// Calorie Tracker Part (green)
+// Calorie Tracker Part (project_diagram.png - green)
 class CalorieTracker {
     constructor() { // The constructor runs immediately when the class is instanciated
         this._calorieLimit = 2200  // _ because we want to juse the property just in this class
@@ -21,7 +21,7 @@ class CalorieTracker {
         this._render(); // To render / update the values (total calories) - DOM
     }
 
-    addMWorkout(workout) {
+    addWorkout(workout) {
         this._workouts.push(workout);
         this._totalCalories -= workout.calories;
         this._render(); // To render / update the values (total calories) - DOM
@@ -82,7 +82,7 @@ class CalorieTracker {
         caloriesProgressEl.style.width = `${width}%`;
     }
 
-    _render() { // To render / update the values (total calories) - DOM
+    _render() { // To render / update the values (total calories...) - DOM
         this._displayCaloriesTotal();
         this._displayCaloriesConsumed();
         this._displayCaloriesBurned();
@@ -107,15 +107,84 @@ class Workout {
     }
 }
 
-const tracker = new CalorieTracker; // To create a new tracker
+// For testing purposes only
 
-const breakfast = new Meal('Breakfast', 400);   // To create a new meal
-tracker.addMeal(breakfast); // To add the meal to the tracker
-const lunch = new Meal('Lunch', 850);   // To create a new meal
-tracker.addMeal(lunch); // To add the meal to the tracker
-console.log(tracker._meals);    // Object { id: "faf12c67bf24c8", name: "Breakfast", calories: 400 }
+// const tracker = new CalorieTracker; // To create a new tracker
 
-const run = new Workout('Morning run', 320);   // To create a new workout
-tracker.addMWorkout(run); // To add the workout to the tracker
-console.log(tracker._workouts); // Object { id: "e67188e5bccf6", name: "Morning run", calories: 300 }
-console.log(tracker._totalCalories);    // 100
+// const breakfast = new Meal('Breakfast', 400);   // To create a new meal
+// tracker.addMeal(breakfast); // To add the meal to the tracker
+// const lunch = new Meal('Lunch', 850);   // To create a new meal
+// tracker.addMeal(lunch); // To add the meal to the tracker
+// console.log(tracker._meals);    // Object { id: "faf12c67bf24c8", name: "Breakfast", calories: 400 }
+
+// const run = new Workout('Morning run', 320);   // To create a new workout
+// tracker.addMWorkout(run); // To add the workout to the tracker
+// console.log(tracker._workouts); // Object { id: "e67188e5bccf6", name: "Morning run", calories: 300 }
+// console.log(tracker._totalCalories);    // 100
+
+
+// Calorie App Part (project_diagram.png - yellow)
+class App {
+    constructor() {
+        this._tracker = new CalorieTracker(); // To create a new tracker
+
+        document.getElementById('meal-form').addEventListener('submit', this._newMeal.bind(this)); // // To add a new meal to the tracker via form // without .bind(this) .this would just refer to <form id="meal-form"> but it should refer to App {_tracker: CalorieTracker}
+        document.getElementById('workout-form').addEventListener('submit', this._newWorkout.bind(this)); // // To add a new workout to the tracker via form // without .bind(this) .this would just refer to <form id="meal-form"> but it should refer to App {_tracker: CalorieTracker}
+    }
+
+    _newMeal(e) {   // To call the private method newMeal 
+        e.preventDefault(); // To prevent the submission
+        // console.log(this);
+        const nameField = document.getElementById('meal-name');    // To get the meal name field from the input form + Add Meal
+        const caloriesField = document.getElementById('meal-calories');    // To get the meal calories field from the input form + Add Meal
+
+        // Validate inputs
+        if (nameField.value === '' || caloriesField.value === '') {
+            alert('Please fill in all fields');
+            return;
+        }
+
+        // To add the typed in meal to the tracker
+        const meal = new Meal(nameField.value, +caloriesField.value);   // To create a new meal - the plus sign changes the string-type caloriesValue to the number-type
+        this._tracker.addMeal(meal); // To add the meal to the tracker
+
+        // To clear the form after submitting a new meal
+        nameField.value = '';
+        caloriesField.value = '';
+
+        // To collapse the form after submission
+        const collapseMealDiv = document.getElementById('collapse-meal');   // The div where the meal form is in
+        const bsCollapse = new bootstrap.Collapse(collapseMealDiv, {    // We have access to it because of the boostrap JS file
+            toggle: true
+        })
+    }; 
+
+    _newWorkout(e) {   // To call the private method newMeal 
+        e.preventDefault(); // To prevent the submission
+        // console.log(this);
+        const nameField = document.getElementById('workout-name');    // To get the meal name field from the input form + Add Meal
+        const caloriesField = document.getElementById('workout-calories');    // To get the meal calories field from the input form + Add Meal
+
+        // Validate inputs
+        if (nameField.value === '' || caloriesField.value === '') {
+            alert('Please fill in all fields');
+            return;
+        }
+
+        // To add the typed in meal to the tracker
+        const workout = new Workout(nameField.value, +caloriesField.value);   // To create a new workout - the plus sign changes the string-type caloriesValue to the number-type
+        this._tracker.addWorkout(workout); // To add the workout to the tracker
+
+        // To clear the form after submitting a new workout
+        nameField.value = '';
+        caloriesField.value = '';
+
+        // To collapse the form after submission
+        const collapseWorkoutlDiv = document.getElementById('collapse-workout');   // The div where the meal form is in
+        const bsCollapse = new bootstrap.Collapse(collapseWorkoutlDiv, {    // We have access to it because of the boostrap JS file
+            toggle: true
+        })
+    }; 
+}
+
+const app = new App();
