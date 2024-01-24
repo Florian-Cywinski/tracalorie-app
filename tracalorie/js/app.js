@@ -11,6 +11,7 @@ class CalorieTracker {
         this._displayCaloriesConsumed();   // To display all consumed calories
         this._displayCaloriesBurned();   // To display all burned calories
         this._displayCaloriesRemaining();   // To display the remaining calories
+        this._displayCaloriesProgress();    // To display the calorie progress
     }
 
     // Public Methods / API's (public API's to use outside of the class)
@@ -57,8 +58,28 @@ class CalorieTracker {
 
     _displayCaloriesRemaining() {
         const caloriesRemainingEl = document.getElementById('calories-remaining');
+        const caloriesProgressEl = document.getElementById('calorie-progress');
         const remainingCalories = this._calorieLimit - this._totalCalories;
         caloriesRemainingEl.innerHTML = remainingCalories;
+
+        if (remainingCalories <= 0) {    // To toggle the class between bg-light (if the remainig calories are > 0) and else bg-danger
+            caloriesRemainingEl.parentElement.parentElement.classList.remove('bg-light');
+            caloriesRemainingEl.parentElement.parentElement.classList.add('bg-danger');
+            caloriesProgressEl.classList.remove('bg-success');
+            caloriesProgressEl.classList.add('bg-danger');
+        } else {
+            caloriesRemainingEl.parentElement.parentElement.classList.add('bg-light');
+            caloriesRemainingEl.parentElement.parentElement.classList.remove('bg-danger');
+            caloriesProgressEl.classList.add('bg-success');
+            caloriesProgressEl.classList.remove('bg-danger');
+        }
+    }
+
+    _displayCaloriesProgress() {
+        const caloriesProgressEl = document.getElementById('calorie-progress');
+        const percentageOfCalorieProgress = (this._totalCalories / this._calorieLimit) * 100;
+        const width = Math.min(percentageOfCalorieProgress, 100);   // .min takes the lower value of percentageOfCalorieProgress and 100 - for the case percentageOfCalorieProgress is geater than 100
+        caloriesProgressEl.style.width = `${width}%`;
     }
 
     _render() { // To render / update the values (total calories) - DOM
@@ -66,6 +87,7 @@ class CalorieTracker {
         this._displayCaloriesConsumed();
         this._displayCaloriesBurned();
         this._displayCaloriesRemaining();
+        this._displayCaloriesProgress();
     }
 }
 
@@ -89,7 +111,7 @@ const tracker = new CalorieTracker; // To create a new tracker
 
 const breakfast = new Meal('Breakfast', 400);   // To create a new meal
 tracker.addMeal(breakfast); // To add the meal to the tracker
-const lunch = new Meal('Lunch', 350);   // To create a new meal
+const lunch = new Meal('Lunch', 850);   // To create a new meal
 tracker.addMeal(lunch); // To add the meal to the tracker
 console.log(tracker._meals);    // Object { id: "faf12c67bf24c8", name: "Breakfast", calories: 400 }
 
