@@ -56,6 +56,12 @@ class CalorieTracker {
         this._render();
     }
 
+    setLimit(calorieLimit) {
+        this._calorieLimit = calorieLimit;  // To set the limit
+        this._displayCaloriesLimit();   // To display the limit
+        this._render(); // To render / update the DOM
+    }
+
     // Private Methods _
     _displayCaloriesTotal() {
         const totalCaloriesEl = document.getElementById('calories-total');
@@ -210,6 +216,7 @@ class App {
         document.getElementById('filter-meals').addEventListener('keyup', this._filterItems.bind(this, 'meal'));   // To filter meals // without .bind(this) .this would just refer to the filter field but it should refer to App {_tracker: CalorieTracker} - 'meal' after this is just a parameter we typed in to be able to distinguish between meal and workout
         document.getElementById('filter-workouts').addEventListener('keyup', this._filterItems.bind(this, 'workout'));   // To delete a meal item // without .bind(this) .this would just refer to the filter field but it should refer to App {_tracker: CalorieTracker} - 'meal' after this is just a parameter we typed in to be able to distinguish between meal and workout
         document.getElementById('reset').addEventListener('click', this._reset.bind(this));   // To reset the day // without .bind(this) .this would just refer to the reset button but it should refer to App {_tracker: CalorieTracker}
+        document.getElementById('limit-form').addEventListener('submit', this._setLimit.bind(this));   // To be able to set a limit // without .bind(this) .this would just refer to the set limit button but it should refer to App {_tracker: CalorieTracker}
     }
 
     _newItem(type, e) {   // To call the private method newItem (type is the argument = meal or workout)
@@ -283,6 +290,26 @@ class App {
         document.getElementById('workout-items').innerHTML = '';     // To delete all items
         document.getElementById('filter-meals').value = ''; // To clear the filter input field
         document.getElementById('filter-workouts').value = '';  // To clear the filter input field
+    }
+
+    _setLimit(e) {
+        e.preventDefault();
+
+        const limit = document.getElementById('limit');
+
+        if (limit.value === '') {
+            alert('Please add a limit')
+            return
+        }
+
+        this._tracker.setLimit(+limit.value);   // To call the method with the argument of +limit.value (+ to chnage the string into a value)
+        limit.value = '';   // To clear the limit form
+
+        // To close the bootstrap modal (the window which pops up)
+        const modalEl = document.getElementById('limit-modal'); // To get the element
+        const modal = bootstrap.Modal.getInstance(modalEl);
+        modal.hide();   // To collapse the modal after we typed in a value
+
     }
 }
 
