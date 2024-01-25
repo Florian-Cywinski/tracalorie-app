@@ -49,6 +49,13 @@ class CalorieTracker {
         }
     }
 
+    reset() {
+        this._totalCalories = 0;
+        this._meals = [];
+        this._workouts = [];
+        this._render();
+    }
+
     // Private Methods _
     _displayCaloriesTotal() {
         const totalCaloriesEl = document.getElementById('calories-total');
@@ -197,10 +204,12 @@ class App {
         this._tracker = new CalorieTracker(); // To create a new tracker
 
         // Event listener
-        document.getElementById('meal-form').addEventListener('submit', this._newItem.bind(this, 'meal'));  // To add a new meal to the tracker via form // without .bind(this) .this would just refer to <form id="meal-form"> but it should refer to App {_tracker: CalorieTracker} - 'meal' after this is just a parameter we typed in to be able to distinguish between meal and workout
+        document.getElementById('meal-form').addEventListener('submit', this._newItem.bind(this, 'meal'));  // To add a new meal to the tracker via form // without .bind(this) .this would just refer to <form id="meal-form"> but it should refer to App {_tracker: CalorieTracker} (to the _newItem(type, e) method) - 'meal' after this is just a parameter we typed in to be able to distinguish between meal and workout
         document.getElementById('workout-form').addEventListener('submit', this._newItem.bind(this, 'workout'));    // To add a new workout to the tracker via form // without .bind(this) .this would just refer to <form id="meal-form"> but it should refer to App {_tracker: CalorieTracker} - 'workout' after this is just a parameter we typed in to be able to distinguish between meal and workout
         document.getElementById('meal-items').addEventListener('click', this._removeItem.bind(this, 'meal'));   // To delete a meal item // without .bind(this) .this would just refer to the clicked icon but it should refer to App {_tracker: CalorieTracker} - 'meal' after this is just a parameter we typed in to be able to distinguish between meal and workout
-        document.getElementById('workout-items').addEventListener('click', this._removeItem.bind(this, 'workout'));   // To delete a meal item // without .bind(this) .this would just refer to the clicked icon but it should refer to App {_tracker: CalorieTracker} - 'meal' after this is just a parameter we typed in to be able to distinguish between meal and workout
+        document.getElementById('filter-meals').addEventListener('keyup', this._filterItems.bind(this, 'meal'));   // To filter meals // without .bind(this) .this would just refer to the filter field but it should refer to App {_tracker: CalorieTracker} - 'meal' after this is just a parameter we typed in to be able to distinguish between meal and workout
+        document.getElementById('filter-workouts').addEventListener('keyup', this._filterItems.bind(this, 'workout'));   // To delete a meal item // without .bind(this) .this would just refer to the filter field but it should refer to App {_tracker: CalorieTracker} - 'meal' after this is just a parameter we typed in to be able to distinguish between meal and workout
+        document.getElementById('reset').addEventListener('click', this._reset.bind(this));   // To reset the day // without .bind(this) .this would just refer to the reset button but it should refer to App {_tracker: CalorieTracker}
     }
 
     _newItem(type, e) {   // To call the private method newItem (type is the argument = meal or workout)
@@ -250,6 +259,30 @@ class App {
                 e.target.closest('.card').remove()
             }
         }
+    }
+
+    _filterItems(type, e) {
+        const text = e.target.value.toLowerCase();
+        // console.log(text);   // Just for testing
+        document.querySelectorAll(`#${type}-items .card`).forEach(item => {  // ${type}-items .card to get either the div with the id of meal-items or workout-items and then we select all cards (with the class of card) in #meal-items / #workout-items 
+            const name = item.firstElementChild.firstElementChild.textContent;  // item is a card of meal-items / workout-items - then we go down in the hierarchy until we reach <h4 class="mx-1">${workout.name}</h4> where we get the name
+
+            if (name.toLowerCase().indexOf(text) !== -1) {  // if there is an item whose name matches the text entered
+                item.style.display = 'block';   // To show the matched item / card in the DOM
+            } else {
+                item.style.display = 'none';    // To not show the unmatched item / card in the DOM
+            }
+        });
+    }
+
+    _reset() {
+        this._tracker.reset()   // To call the reset function of the tracker which resets all tracked values
+
+        // To delete everything from the DOM
+        document.getElementById('meal-items').innerHTML = '';   // To delete all items
+        document.getElementById('workout-items').innerHTML = '';     // To delete all items
+        document.getElementById('filter-meals').value = ''; // To clear the filter input field
+        document.getElementById('filter-workouts').value = '';  // To clear the filter input field
     }
 }
 
