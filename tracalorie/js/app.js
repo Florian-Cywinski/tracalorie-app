@@ -29,6 +29,26 @@ class CalorieTracker {
         this._render(); // To render / update the values (total calories) - DOM
     }
 
+    removeMeal(id) {
+        const index = this._meals.findIndex((meal) => meal.id === id);  // Loops through the meals array - each element is an meal object which has an id key-value pair - findIndex() gives -1 if it doesn't match
+        if (index !== -1) { // For the case that a meal with the correct ID was found
+            const meal = this._meals[index];    // To separat the resprective meal from the _meals array
+            this._totalCalories -= meal.calories;   // To subtract the calories of the meal which will be deleted
+            this._meals.splice(index, 1);   // To delete the respective meal from the _meals array
+            this._render(); // To render / update the values
+        }
+    }
+
+    removeWorkout(id) {
+        const index = this._workouts.findIndex((workout) => workout.id === id);  // Loops through the workouts array - each element is an workout object which has an id key-value pair - findIndex() gives -1 if it doesn't match
+        if (index !== -1) { // For the case that a workout with the correct ID was found
+            const workout = this._workouts[index];    // To separat the resprective workout from the _workouts array
+            this._totalCalories += workout.calories;   // To subtract the calories of the workout which will be deleted
+            this._workouts.splice(index, 1);   // To delete the respective workout from the _workouts array
+            this._render(); // To render / update the values
+        }
+    }
+
     // Private Methods _
     _displayCaloriesTotal() {
         const totalCaloriesEl = document.getElementById('calories-total');
@@ -176,8 +196,11 @@ class App {
     constructor() {
         this._tracker = new CalorieTracker(); // To create a new tracker
 
-        document.getElementById('meal-form').addEventListener('submit', this._newItem.bind(this, 'meal')); // // To add a new meal to the tracker via form // without .bind(this) .this would just refer to <form id="meal-form"> but it should refer to App {_tracker: CalorieTracker} - 'meal' after this is just a parameter we typed in to be able to distinguish between meal and workout
-        document.getElementById('workout-form').addEventListener('submit', this._newItem.bind(this, 'workout')); // // To add a new workout to the tracker via form // without .bind(this) .this would just refer to <form id="meal-form"> but it should refer to App {_tracker: CalorieTracker} - 'workout' after this is just a parameter we typed in to be able to distinguish between meal and workout
+        // Event listener
+        document.getElementById('meal-form').addEventListener('submit', this._newItem.bind(this, 'meal'));  // To add a new meal to the tracker via form // without .bind(this) .this would just refer to <form id="meal-form"> but it should refer to App {_tracker: CalorieTracker} - 'meal' after this is just a parameter we typed in to be able to distinguish between meal and workout
+        document.getElementById('workout-form').addEventListener('submit', this._newItem.bind(this, 'workout'));    // To add a new workout to the tracker via form // without .bind(this) .this would just refer to <form id="meal-form"> but it should refer to App {_tracker: CalorieTracker} - 'workout' after this is just a parameter we typed in to be able to distinguish between meal and workout
+        document.getElementById('meal-items').addEventListener('click', this._removeItem.bind(this, 'meal'));   // To delete a meal item // without .bind(this) .this would just refer to the clicked icon but it should refer to App {_tracker: CalorieTracker} - 'meal' after this is just a parameter we typed in to be able to distinguish between meal and workout
+        document.getElementById('workout-items').addEventListener('click', this._removeItem.bind(this, 'workout'));   // To delete a meal item // without .bind(this) .this would just refer to the clicked icon but it should refer to App {_tracker: CalorieTracker} - 'meal' after this is just a parameter we typed in to be able to distinguish between meal and workout
     }
 
     _newItem(type, e) {   // To call the private method newItem (type is the argument = meal or workout)
@@ -211,6 +234,23 @@ class App {
             toggle: true
         })
     }; 
+
+    // To remove items by clicking the delete (x) icon of the respective item
+    _removeItem(type, e) {
+        if (e.target.classList.contains('delete') || e.target.classList.contains('fa-xmark')) { // if the clicked target is either the delete button or its icon 
+            if (confirm('Are you sure?')) { // if we confirm to delete in the popped up window
+                // console.log('delete');  // Just to check whether it works up to this point
+                const id = e.target.closest('.card').getAttribute('data-id')   // .closest() is a method to get the closest whatever - in this case the closest '.card' to get the respective ID
+                // console.log(id);    // Just to check whether it works - dea768b5cee138
+
+                // To remove the item from the tracker - that all stats are updated
+                type === 'meal' ? this._tracker.removeMeal(id) : this._tracker.removeWorkout(id);
+
+                // To remove the item from the DOM
+                e.target.closest('.card').remove()
+            }
+        }
+    }
 }
 
 const app = new App();
