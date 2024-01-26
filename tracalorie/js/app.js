@@ -1,8 +1,9 @@
+// Tracalorie App
 
 // Calorie Tracker Part (project_diagram.png - green)
 class CalorieTracker {
     constructor() { // The constructor runs immediately when the class is instanciated
-        this._calorieLimit = 2200  // _ because we want to juse the property just in this class
+        this._calorieLimit = Storage.getCalorieLimit(2000);  // To call the static method getCalorieLimit with a default value of 2000 (directly on the class Storage) // _ because we want to juse the property just in this class
         this._totalCalories = 0;
         this._meals = [];
         this._workouts = [];
@@ -58,6 +59,7 @@ class CalorieTracker {
 
     setLimit(calorieLimit) {
         this._calorieLimit = calorieLimit;  // To set the limit
+        Storage.setCalorieLimit(calorieLimit);  // To set the limit to local storage
         this._displayCaloriesLimit();   // To display the limit
         this._render(); // To render / update the DOM
     }
@@ -172,6 +174,9 @@ class CalorieTracker {
     }
 }
 
+
+// -----------------------------------------------------------------------------------------------------------
+// Meal and Workout Part (project_diagram.png - lilac)
 class Meal {
     constructor(name, calories) {
         this.id = Math.random().toString(16).slice(2)   // To generate a 14-digit hexadecimal number as an ID
@@ -188,23 +193,28 @@ class Workout {
     }
 }
 
-// For testing purposes only
 
-// const tracker = new CalorieTracker; // To create a new tracker
+// -----------------------------------------------------------------------------------------------------------
+// Storage Part (project_diagram.png - rose) - Initializer
+class Storage { 
+    static getCalorieLimit(defaultLimit = 2300) {   // All methods are static because we don't need multiple instances (local storage) 
+        let calorieLimit;
+        if (localStorage.getItem('calorieLimit') === null) {    // To check whether there is already an item called calorieLimit in local storage
+            calorieLimit = defaultLimit;
+        } else {
+            calorieLimit = +localStorage.getItem('calorieLimit');
+        }
+        return calorieLimit;
+    }
 
-// const breakfast = new Meal('Breakfast', 400);   // To create a new meal
-// tracker.addMeal(breakfast); // To add the meal to the tracker
-// const lunch = new Meal('Lunch', 850);   // To create a new meal
-// tracker.addMeal(lunch); // To add the meal to the tracker
-// console.log(tracker._meals);    // Object { id: "faf12c67bf24c8", name: "Breakfast", calories: 400 }
-
-// const run = new Workout('Morning run', 320);   // To create a new workout
-// tracker.addMWorkout(run); // To add the workout to the tracker
-// console.log(tracker._workouts); // Object { id: "e67188e5bccf6", name: "Morning run", calories: 300 }
-// console.log(tracker._totalCalories);    // 100
+    static setCalorieLimit(calorieLimit) {
+        localStorage.setItem('calorieLimit', calorieLimit);
+    }
+}
 
 
-// Calorie App Part (project_diagram.png - yellow)
+// -----------------------------------------------------------------------------------------------------------
+// App Part (project_diagram.png - yellow) - Initializer
 class App {
     constructor() {
         this._tracker = new CalorieTracker(); // To create a new tracker
@@ -313,4 +323,4 @@ class App {
     }
 }
 
-const app = new App();
+const app = new App();  // Initializer
