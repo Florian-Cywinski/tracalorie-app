@@ -5,7 +5,7 @@ class CalorieTracker {
     constructor() { // The constructor runs immediately when the class is instanciated
         this._calorieLimit = Storage.getCalorieLimit(2000);  // To call the static method getCalorieLimit with a default value of 2000 (directly on the class Storage) // _ because we want to juse the property just in this class
         this._totalCalories = Storage.getTotalCalories(0);   // To call the static method getTotalCalories
-        this._meals = [];
+        this._meals = Storage.getMeals();   // To get the meals array from local storage
         this._workouts = [];
         this._displayCaloriesLimit();   // To display the calorie limit
         this._displayCaloriesTotal();   // To display the total calories
@@ -20,6 +20,7 @@ class CalorieTracker {
         this._meals.push(meal);
         this._totalCalories += meal.calories;   // Updates the totalCalories on memory
         Storage.updateTotalCalories(this._totalCalories);   // Updates the totalCalories on local storage
+        Storage.saveMeal(meal); // To save the new meal to local storage
         this._displayNewMeal(meal);
         this._render(); // To render / update the values (total calories) - DOM
     }
@@ -66,6 +67,10 @@ class CalorieTracker {
         Storage.setCalorieLimit(calorieLimit);  // To set the limit to local storage
         this._displayCaloriesLimit();   // To display the limit
         this._render(); // To render / update the DOM
+    }
+
+    loadItems() {
+        this._meals.forEach(meal => this._displayNewMeal(meal));
     }
 
     // Private Methods _
@@ -228,6 +233,22 @@ class Storage {
     static updateTotalCalories(calories) {
         localStorage.setItem('totalCalories', calories);
     }
+
+    static getMeals() { 
+        let meals;
+        if (localStorage.getItem('meals') === null) {    // To check whether there is already an item called meals in local storage
+            meals = []; // This will be stored as stringified array
+        } else {
+            meals = JSON.parse(localStorage.getItem('meals'));  // JSON.parse because meals is stored as stringified array
+        }
+        return meals;
+    }
+
+    static saveMeal(meal) {
+        const meals = Storage.getMeals();
+        meals.push(meal);
+        localStorage.setItem('meal', JSON.stringify(meals));    // JSON.stringify to stringify the meals array
+    }
 }
 
 
@@ -236,8 +257,11 @@ class Storage {
 class App {
     constructor() {
         this._tracker = new CalorieTracker(); // To create a new tracker
+        this._loadEventListeners();
+        this._tracker.loadItems();  // To call the loadItems method from the CalorieTracker part which loads all items from local storage
+    }
 
-        // Event listener
+    _loadEventListeners() {
         document.getElementById('meal-form').addEventListener('submit', this._newItem.bind(this, 'meal'));  // To add a new meal to the tracker via form // without .bind(this) .this would just refer to <form id="meal-form"> but it should refer to App {_tracker: CalorieTracker} (to the _newItem(type, e) method) - 'meal' after this is just a parameter we typed in to be able to distinguish between meal and workout
         document.getElementById('workout-form').addEventListener('submit', this._newItem.bind(this, 'workout'));    // To add a new workout to the tracker via form // without .bind(this) .this would just refer to <form id="meal-form"> but it should refer to App {_tracker: CalorieTracker} - 'workout' after this is just a parameter we typed in to be able to distinguish between meal and workout
         document.getElementById('meal-items').addEventListener('click', this._removeItem.bind(this, 'meal'));   // To delete a meal item // without .bind(this) .this would just refer to the clicked icon but it should refer to App {_tracker: CalorieTracker} - 'meal' after this is just a parameter we typed in to be able to distinguish between meal and workout
