@@ -4,7 +4,7 @@
 class CalorieTracker {
     constructor() { // The constructor runs immediately when the class is instanciated
         this._calorieLimit = Storage.getCalorieLimit(2000);  // To call the static method getCalorieLimit with a default value of 2000 (directly on the class Storage) // _ because we want to juse the property just in this class
-        this._totalCalories = 0;
+        this._totalCalories = Storage.getTotalCalories(0);   // To call the static method getTotalCalories
         this._meals = [];
         this._workouts = [];
         this._displayCaloriesLimit();   // To display the calorie limit
@@ -18,14 +18,16 @@ class CalorieTracker {
     // Public Methods / API's (public API's to use outside of the class)
     addMeal(meal) {
         this._meals.push(meal);
-        this._totalCalories += meal.calories;
+        this._totalCalories += meal.calories;   // Updates the totalCalories on memory
+        Storage.updateTotalCalories(this._totalCalories);   // Updates the totalCalories on local storage
         this._displayNewMeal(meal);
         this._render(); // To render / update the values (total calories) - DOM
     }
 
     addWorkout(workout) {
         this._workouts.push(workout);
-        this._totalCalories -= workout.calories;
+        this._totalCalories -= workout.calories;    // Updates the totalCalories on memory
+        Storage.updateTotalCalories(this._totalCalories);   // Updates the totalCalories on local storage
         this._displayNewWorkout(workout);
         this._render(); // To render / update the values (total calories) - DOM
     }
@@ -35,6 +37,7 @@ class CalorieTracker {
         if (index !== -1) { // For the case that a meal with the correct ID was found
             const meal = this._meals[index];    // To separat the resprective meal from the _meals array
             this._totalCalories -= meal.calories;   // To subtract the calories of the meal which will be deleted
+            Storage.updateTotalCalories(this._totalCalories);   // Updates the totalCalories on local storage
             this._meals.splice(index, 1);   // To delete the respective meal from the _meals array
             this._render(); // To render / update the values
         }
@@ -45,6 +48,7 @@ class CalorieTracker {
         if (index !== -1) { // For the case that a workout with the correct ID was found
             const workout = this._workouts[index];    // To separat the resprective workout from the _workouts array
             this._totalCalories += workout.calories;   // To subtract the calories of the workout which will be deleted
+            Storage.updateTotalCalories(this._totalCalories);   // Updates the totalCalories on local storage
             this._workouts.splice(index, 1);   // To delete the respective workout from the _workouts array
             this._render(); // To render / update the values
         }
@@ -209,6 +213,20 @@ class Storage {
 
     static setCalorieLimit(calorieLimit) {
         localStorage.setItem('calorieLimit', calorieLimit);
+    }
+
+    static getTotalCalories(defaultCalories = 0) { 
+        let totalCalories;
+        if (localStorage.getItem('totalCalories') === null) {    // To check whether there is already an item called totalCalories in local storage
+            totalCalories = defaultCalories;
+        } else {
+            totalCalories = +localStorage.getItem('totalCalories');
+        }
+        return totalCalories;
+    }
+
+    static updateTotalCalories(calories) {
+        localStorage.setItem('totalCalories', calories);
     }
 }
 
