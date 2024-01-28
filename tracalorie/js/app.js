@@ -6,7 +6,7 @@ class CalorieTracker {
         this._calorieLimit = Storage.getCalorieLimit(2000);  // To call the static method getCalorieLimit with a default value of 2000 (directly on the class Storage) // _ because we want to juse the property just in this class
         this._totalCalories = Storage.getTotalCalories(0);   // To call the static method getTotalCalories
         this._meals = Storage.getMeals();   // To get the meals array from local storage
-        this._workouts = [];
+        this._workouts = Storage.getWorkouts();   // To get the workout array from local storage
         this._displayCaloriesLimit();   // To display the calorie limit
         this._displayCaloriesTotal();   // To display the total calories
         this._displayCaloriesConsumed();   // To display all consumed calories
@@ -29,6 +29,7 @@ class CalorieTracker {
         this._workouts.push(workout);
         this._totalCalories -= workout.calories;    // Updates the totalCalories on memory
         Storage.updateTotalCalories(this._totalCalories);   // Updates the totalCalories on local storage
+        Storage.saveWorkout(workout); // To save the new meal to local storage
         this._displayNewWorkout(workout);
         this._render(); // To render / update the values (total calories) - DOM
     }
@@ -71,6 +72,7 @@ class CalorieTracker {
 
     loadItems() {
         this._meals.forEach(meal => this._displayNewMeal(meal));
+        this._workouts.forEach(workout => this._displayNewWorkout(workout));
     }
 
     // Private Methods _
@@ -248,6 +250,22 @@ class Storage {
         const meals = Storage.getMeals();
         meals.push(meal);
         localStorage.setItem('meal', JSON.stringify(meals));    // JSON.stringify to stringify the meals array
+    }
+
+    static getWorkouts() { 
+        let workouts;
+        if (localStorage.getItem('workouts') === null) {    // To check whether there is already an item called workouts in local storage
+            workouts = []; // This will be stored as stringified array
+        } else {
+            workouts = JSON.parse(localStorage.getItem('workouts'));  // JSON.parse because workouts is stored as stringified array
+        }
+        return workouts;
+    }
+
+    static saveWorkout(workout) {
+        const workouts = Storage.getWorkouts();
+        workouts.push(workout);
+        localStorage.setItem('workout', JSON.stringify(workouts));    // JSON.stringify to stringify the workouts array
     }
 }
 
