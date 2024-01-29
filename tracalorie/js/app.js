@@ -41,6 +41,7 @@ class CalorieTracker {
             this._totalCalories -= meal.calories;   // To subtract the calories of the meal which will be deleted
             Storage.updateTotalCalories(this._totalCalories);   // Updates the totalCalories on local storage
             this._meals.splice(index, 1);   // To delete the respective meal from the _meals array
+            Storage.removeMeal(id); // To call the method removeMeal
             this._render(); // To render / update the values
         }
     }
@@ -52,6 +53,7 @@ class CalorieTracker {
             this._totalCalories += workout.calories;   // To subtract the calories of the workout which will be deleted
             Storage.updateTotalCalories(this._totalCalories);   // Updates the totalCalories on local storage
             this._workouts.splice(index, 1);   // To delete the respective workout from the _workouts array
+            Storage.removeWorkout(id); // To call the method removeWorkout
             this._render(); // To render / update the values
         }
     }
@@ -249,7 +251,17 @@ class Storage {
     static saveMeal(meal) {
         const meals = Storage.getMeals();
         meals.push(meal);
-        localStorage.setItem('meal', JSON.stringify(meals));    // JSON.stringify to stringify the meals array
+        localStorage.setItem('meals', JSON.stringify(meals));    // JSON.stringify to stringify the meals array
+    }
+
+    static removeMeal(id) {
+        const meals = Storage.getMeals();
+        meals.forEach((meal, index) => {
+            if (meal.id === id) {
+                meals.splice(index, 1);
+            }
+        });
+        localStorage.setItem('meals', JSON.stringify(meals));
     }
 
     static getWorkouts() { 
@@ -265,7 +277,17 @@ class Storage {
     static saveWorkout(workout) {
         const workouts = Storage.getWorkouts();
         workouts.push(workout);
-        localStorage.setItem('workout', JSON.stringify(workouts));    // JSON.stringify to stringify the workouts array
+        localStorage.setItem('workouts', JSON.stringify(workouts));    // JSON.stringify to stringify the workouts array
+    }
+
+    static removeWorkout(id) {
+        const workouts = Storage.getWorkouts();
+        workouts.forEach((workout, index) => {
+            if (workout.id === id) {
+                workouts.splice(index, 1);
+            }
+        });
+        localStorage.setItem('workouts', JSON.stringify(workouts));
     }
 }
 
@@ -283,6 +305,7 @@ class App {
         document.getElementById('meal-form').addEventListener('submit', this._newItem.bind(this, 'meal'));  // To add a new meal to the tracker via form // without .bind(this) .this would just refer to <form id="meal-form"> but it should refer to App {_tracker: CalorieTracker} (to the _newItem(type, e) method) - 'meal' after this is just a parameter we typed in to be able to distinguish between meal and workout
         document.getElementById('workout-form').addEventListener('submit', this._newItem.bind(this, 'workout'));    // To add a new workout to the tracker via form // without .bind(this) .this would just refer to <form id="meal-form"> but it should refer to App {_tracker: CalorieTracker} - 'workout' after this is just a parameter we typed in to be able to distinguish between meal and workout
         document.getElementById('meal-items').addEventListener('click', this._removeItem.bind(this, 'meal'));   // To delete a meal item // without .bind(this) .this would just refer to the clicked icon but it should refer to App {_tracker: CalorieTracker} - 'meal' after this is just a parameter we typed in to be able to distinguish between meal and workout
+        document.getElementById('workout-items').addEventListener('click', this._removeItem.bind(this, 'workout'));   // To delete a meal item // without .bind(this) .this would just refer to the clicked icon but it should refer to App {_tracker: CalorieTracker} - 'meal' after this is just a parameter we typed in to be able to distinguish between meal and workout
         document.getElementById('filter-meals').addEventListener('keyup', this._filterItems.bind(this, 'meal'));   // To filter meals // without .bind(this) .this would just refer to the filter field but it should refer to App {_tracker: CalorieTracker} - 'meal' after this is just a parameter we typed in to be able to distinguish between meal and workout
         document.getElementById('filter-workouts').addEventListener('keyup', this._filterItems.bind(this, 'workout'));   // To delete a meal item // without .bind(this) .this would just refer to the filter field but it should refer to App {_tracker: CalorieTracker} - 'meal' after this is just a parameter we typed in to be able to distinguish between meal and workout
         document.getElementById('reset').addEventListener('click', this._reset.bind(this));   // To reset the day // without .bind(this) .this would just refer to the reset button but it should refer to App {_tracker: CalorieTracker}
