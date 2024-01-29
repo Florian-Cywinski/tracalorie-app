@@ -13,6 +13,7 @@ class CalorieTracker {
         this._displayCaloriesBurned();   // To display all burned calories
         this._displayCaloriesRemaining();   // To display the remaining calories
         this._displayCaloriesProgress();    // To display the calorie progress
+        document.getElementById('limit').value = this._calorieLimit;   // To set the current calorie limit as blind text into the calorie limit input field
     }
 
     // Public Methods / API's (public API's to use outside of the class)
@@ -62,6 +63,7 @@ class CalorieTracker {
         this._totalCalories = 0;
         this._meals = [];
         this._workouts = [];
+        Storage.clearAll();
         this._render();
     }
 
@@ -288,6 +290,16 @@ class Storage {
             }
         });
         localStorage.setItem('workouts', JSON.stringify(workouts));
+    }
+
+    static clearAll() {
+        // To clear all from local storage
+        // localStorage.clear();   
+
+        // To let the calorieLimit in local storage we have to delete all other variables from local storage
+        localStorage.removeItem('totalCalories');
+        localStorage.removeItem('meals');
+        localStorage.removeItem('workouts');
     }
 }
 
