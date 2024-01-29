@@ -2,7 +2,7 @@
 
 Vanilla JS app that tracks your caloric intake - from Brad Traversy's 'Modern JS From The Beginning' course.
 
-Try out the app :) - https://superb-kelpie-e0814a.netlify.app/
+Try out the app :) - https://glowing-pixie-2a7cd2.netlify.app/
 
 Development steps:
 
